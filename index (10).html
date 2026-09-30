@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio Transcription & QA | Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16263D;
+    --ink-soft: #52627A;
+    --paper: #F2F5F9;
+    --surface: #FFFFFF;
+    --line: #D8DFE9;
+    --accent: #2855D9;
+    --accent-soft: #E7EDFC;
+    --wa: #1F9D55;
+    --error: #C23B3B;
+    --radius-lg: 18px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  header {
+    background: var(--ink);
+    color: #fff;
+    padding: 48px 20px 88px;
+    position: relative;
+    overflow: hidden;
+  }
+  .head-inner { max-width: 720px; margin: 0 auto; position: relative; z-index: 1; }
+  .wave {
+    display: flex; align-items: center; gap: 4px; height: 44px; margin-bottom: 24px;
+  }
+  .wave span {
+    width: 4px; border-radius: 4px; background: #7FA0FF;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { transform: scaleY(0.4); opacity: .6; } }
+  @media (prefers-reduced-motion: reduce) { .wave span { animation: none; } }
+  h1 { font-size: clamp(30px, 6vw, 44px); line-height: 1.1; font-weight: 800; letter-spacing: -0.02em; }
+  .lead { margin-top: 14px; color: #BFCBDD; font-size: 17px; max-width: 560px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .chip {
+    font-size: 14px; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.22); color: #E4EAF4;
+  }
+
+  /* Form */
+  main { max-width: 720px; margin: -56px auto 60px; padding: 0 16px; position: relative; z-index: 2; }
+  form { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--line); padding: 32px 28px; }
+  fieldset { border: none; margin-bottom: 34px; }
+  legend { font-size: 20px; font-weight: 700; margin-bottom: 18px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .full { grid-column: 1 / -1; }
+  label { display: block; font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+  .req { color: var(--error); }
+  .hint { font-weight: 400; color: var(--ink-soft); font-size: 13px; }
+  input, select, textarea {
+    width: 100%; font: inherit; font-size: 15px; color: var(--ink);
+    padding: 11px 13px; border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+    background: #fff; transition: border-color .15s;
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .phone { display: grid; grid-template-columns: 110px 1fr; gap: 8px; }
+
+  /* Radio pills */
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills input { position: absolute; opacity: 0; pointer-events: none; }
+  .pills label {
+    font-weight: 500; margin: 0; padding: 9px 16px; border: 1.5px solid var(--line);
+    border-radius: 999px; cursor: pointer; font-size: 14px; background: #fff;
+  }
+  .pills input:checked + label { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .pills input:focus-visible + label { box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  /* Role + rate cards */
+  .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .role input { position: absolute; opacity: 0; pointer-events: none; }
+  .role label {
+    display: block; margin: 0; cursor: pointer; padding: 22px 20px;
+    border: 2px solid var(--line); border-radius: var(--radius-lg); height: 100%;
+  }
+  .role .name { font-size: 15px; font-weight: 600; color: var(--ink-soft); }
+  .role .price { font-size: 38px; font-weight: 800; letter-spacing: -0.03em; margin-top: 6px; line-height: 1; }
+  .role .unit { font-size: 14px; color: var(--ink-soft); font-weight: 500; margin-top: 6px; }
+  .role .desc { font-size: 13.5px; color: var(--ink-soft); font-weight: 400; margin-top: 12px; }
+  .role input:checked + label { border-color: var(--accent); background: var(--accent-soft); }
+  .role input:checked + label .price { color: var(--accent); }
+  .role input:focus-visible + label { box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--ink-soft); margin-bottom: 22px; }
+  .consent input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--accent); }
+
+  button[type=submit] {
+    width: 100%; font: inherit; font-size: 17px; font-weight: 700; color: #fff;
+    background: var(--accent); border: none; padding: 15px; border-radius: var(--radius-sm); cursor: pointer;
+  }
+  button[type=submit]:hover { background: #1F46BD; }
+  button[type=submit]:disabled { opacity: .6; cursor: wait; }
+  .error-msg { color: var(--error); font-size: 14px; margin-top: 12px; text-align: center; min-height: 20px; }
+
+  footer { text-align: center; color: var(--ink-soft); font-size: 14px; padding-bottom: 40px; }
+
+  /* Popup */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(22,38,61,.6); display: none;
+    align-items: center; justify-content: center; padding: 20px; z-index: 50;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: var(--radius-lg); max-width: 420px; width: 100%;
+    padding: 34px 28px; text-align: center; animation: pop .25s ease-out;
+  }
+  @keyframes pop { from { transform: scale(.94); opacity: 0; } }
+  .tick {
+    width: 64px; height: 64px; border-radius: 50%; background: #E3F5EA; color: var(--wa);
+    display: grid; place-items: center; margin: 0 auto 18px;
+  }
+  .modal h2 { font-size: 24px; font-weight: 800; }
+  .modal p { color: var(--ink-soft); margin: 10px 0 24px; }
+  .wa-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--wa); color: #fff; text-decoration: none; font-weight: 700;
+    padding: 14px; border-radius: var(--radius-sm); font-size: 16px;
+  }
+  .wa-btn:hover { background: #188647; }
+
+  @media (max-width: 600px) {
+    form { padding: 24px 18px; }
+    .grid, .roles { grid-template-columns: 1fr; }
+    header { padding-top: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-inner">
+    <div class="wave" id="wave" aria-hidden="true"></div>
+    <h1>Audio Transcription & QA<br>Registration</h1>
+    <p class="lead">Remote audio annotation work. Fill in your details below and choose the role you want to join as.</p>
+    <div class="chips">
+      <span class="chip">Remote</span>
+      <span class="chip">Good English required</span>
+      <span class="chip">PC or laptop required</span>
+      <span class="chip">Immediate start</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <form id="regForm" novalidate>
+
+    <fieldset>
+      <legend>Personal details</legend>
+      <div class="grid">
+        <div class="full">
+          <label for="fullName">Full name <span class="req">*</span></label>
+          <input id="fullName" name="fullName" required autocomplete="name">
+        </div>
+        <div class="full">
+          <label for="phone">WhatsApp number <span class="req">*</span> <span class="hint">with country code</span></label>
+          <div class="phone">
+            <input id="code" value="+880" required aria-label="Country code" inputmode="tel">
+            <input id="phone" required inputmode="tel" placeholder="1XXXXXXXXX">
+          </div>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email">
+        </div>
+        <div>
+          <label for="country">Country <span class="req">*</span></label>
+          <input id="country" name="country" value="Bangladesh" required>
+        </div>
+        <div>
+          <label for="age">Age <span class="req">*</span></label>
+          <input id="age" name="age" type="number" min="18" max="70" required>
+        </div>
+        <div>
+          <label>Gender <span class="req">*</span></label>
+          <div class="pills">
+            <input type="radio" id="g-m" name="gender" value="Male" required><label for="g-m">Male</label>
+            <input type="radio" id="g-f" name="gender" value="Female"><label for="g-f">Female</label>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Education & skills</legend>
+      <div class="grid">
+        <div>
+          <label for="education">Education level <span class="req">*</span></label>
+          <select id="education" name="education" required>
+            <option value="">Select</option>
+            <option>SSC / O Level</option>
+            <option>HSC / A Level</option>
+            <option>Diploma</option>
+            <option>Bachelor's (studying)</option>
+            <option>Bachelor's (completed)</option>
+            <option>Master's or above</option>
+          </select>
+        </div>
+        <div>
+          <label for="english">English level <span class="req">*</span></label>
+          <select id="english" name="english" required>
+            <option value="">Select</option>
+            <option>Intermediate</option>
+            <option>Good</option>
+            <option>Very good</option>
+            <option>Fluent</option>
+          </select>
+        </div>
+        <div>
+          <label for="typing">Typing speed <span class="hint">words per minute</span></label>
+          <input id="typing" name="typing" type="number" min="0" max="200" placeholder="e.g. 40">
+        </div>
+        <div>
+          <label>Transcription experience <span class="req">*</span></label>
+          <div class="pills">
+            <input type="radio" id="x-y" name="experience" value="Yes" required><label for="x-y">Yes</label>
+            <input type="radio" id="x-n" name="experience" value="No"><label for="x-n">No</label>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Availability & setup</legend>
+      <div class="grid">
+        <div class="full">
+          <label>How many hours can you work daily? <span class="req">*</span></label>
+          <div class="pills">
+            <input type="radio" id="h1" name="hours" value="2-3 hours" required><label for="h1">2–3 hours</label>
+            <input type="radio" id="h2" name="hours" value="4-5 hours"><label for="h2">4–5 hours</label>
+            <input type="radio" id="h3" name="hours" value="6-8 hours"><label for="h3">6–8 hours</label>
+            <input type="radio" id="h4" name="hours" value="8+ hours"><label for="h4">8+ hours</label>
+          </div>
+        </div>
+        <div class="full">
+          <label>Do you have a PC or laptop? <span class="req">*</span></label>
+          <div class="pills">
+            <input type="radio" id="d1" name="device" value="Laptop" required><label for="d1">Laptop</label>
+            <input type="radio" id="d2" name="device" value="Desktop PC"><label for="d2">Desktop PC</label>
+            <input type="radio" id="d3" name="device" value="Both"><label for="d3">Both</label>
+            <input type="radio" id="d4" name="device" value="No"><label for="d4">No</label>
+          </div>
+        </div>
+        <div class="full">
+          <label>Do you have good headphones? <span class="req">*</span></label>
+          <div class="pills">
+            <input type="radio" id="p1" name="headphones" value="Over-ear / closed-back" required><label for="p1">Yes, over-ear headphones</label>
+            <input type="radio" id="p2" name="headphones" value="Earphones only"><label for="p2">Earphones only</label>
+            <input type="radio" id="p3" name="headphones" value="No"><label for="p3">No</label>
+          </div>
+        </div>
+        <div class="full">
+          <label>Can you start working today? <span class="req">*</span></label>
+          <div class="pills">
+            <input type="radio" id="s1" name="startToday" value="Yes, today" required><label for="s1">Yes, today</label>
+            <input type="radio" id="s2" name="startToday" value="Within 2-3 days"><label for="s2">Within 2–3 days</label>
+            <input type="radio" id="s3" name="startToday" value="Later"><label for="s3">Later</label>
+          </div>
+        </div>
+        <div class="full">
+          <label for="notes">Anything else we should know?</label>
+          <textarea id="notes" name="notes"></textarea>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Choose your role <span class="req">*</span></legend>
+      <div class="roles">
+        <div class="role">
+          <input type="radio" id="r-tr" name="role" value="Transcription (TR)" required>
+          <label for="r-tr">
+            <div class="name">Transcription (TR)</div>
+            <div class="price">$15</div>
+            <div class="unit">per audio hour</div>
+            <div class="desc">Listen and type what is spoken with timestamps and speaker labels.</div>
+          </label>
+        </div>
+        <div class="role">
+          <input type="radio" id="r-qa" name="role" value="Quality Assurance (QA)">
+          <label for="r-qa">
+            <div class="name">Quality Assurance (QA)</div>
+            <div class="price">$5</div>
+            <div class="unit">per audio hour</div>
+            <div class="desc">Review transcribed files and correct errors in text and timing.</div>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="consent">
+      <input type="checkbox" id="agree" required>
+      <label for="agree" style="font-weight:400;margin:0">I confirm the information above is correct and I agree to keep all project data confidential.</label>
+    </div>
+
+    <button type="submit" id="submitBtn">Submit registration</button>
+    <div class="error-msg" id="errorMsg" role="alert"></div>
+  </form>
+</main>
+
+<footer>Questions? Contact SIYAM, Operational Manager: +8801600866444</footer>
+
+<div class="overlay" id="popup" role="dialog" aria-modal="true" aria-labelledby="popTitle">
+  <div class="modal">
+    <div class="tick">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 id="popTitle">Registration submitted</h2>
+    <p id="popText">Join our WhatsApp group to get training details and task updates.</p>
+    <a class="wa-btn" href="https://chat.whatsapp.com/ERiegiWCeWS61ltSDtz6vF" target="_blank" rel="noopener">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1a8.2 8.2 0 0 1-4-3.5c-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.8.4 3.5 3.5 0 0 0-1.1 2.6 6 6 0 0 0 1.3 3.2 13.8 13.8 0 0 0 5.3 4.7c2 .8 2.7.9 3.7.8a3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.3-.6-.4zM12 21.8a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4a9.8 9.8 0 1 1 8.3 4.6zM20.5 3.5A11.8 11.8 0 0 0 1.9 17.7L.2 24l6.4-1.7A11.8 11.8 0 0 0 24 12a11.7 11.7 0 0 0-3.5-8.5z"/></svg>
+      Join WhatsApp group
+    </a>
+  </div>
+</div>
+
+<script>
+  // Paste your Apps Script Web App URL here
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPLX-TVKJCyBfAWtc4p9hRSeklE1qUf-B27K1FAVN5GeSndHQL6id6z04tpWRmsRj9/exec';
+
+  // Waveform header
+  const wave = document.getElementById('wave');
+  for (let i = 0; i < 48; i++) {
+    const s = document.createElement('span');
+    s.style.height = (10 + Math.abs(Math.sin(i * 0.55)) * 30 + (i % 3) * 3) + 'px';
+    s.style.animationDelay = (i * 0.04) + 's';
+    wave.appendChild(s);
+  }
+
+  const form = document.getElementById('regForm');
+  const btn = document.getElementById('submitBtn');
+  const err = document.getElementById('errorMsg');
+
+  function val(name) {
+    const el = form.querySelector(`[name="${name}"]:checked`) || form.querySelector(`[name="${name}"]`);
+    return el ? el.value.trim() : '';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.textContent = '';
+
+    if (!form.checkValidity()) {
+      const bad = form.querySelector(':invalid');
+      err.textContent = 'Please fill in all required fields marked with *.';
+      if (bad) bad.focus();
+      return;
+    }
+
+    const code = document.getElementById('code').value.trim().replace(/[^\d+]/g, '');
+    const phone = document.getElementById('phone').value.trim().replace(/\D/g, '').replace(/^0+/, '');
+    if (!code.startsWith('+') || phone.length < 6) {
+      err.textContent = 'Enter a valid WhatsApp number with country code (e.g. +880).';
+      return;
+    }
+
+    const data = new URLSearchParams({
+      fullName: val('fullName'),
+      whatsapp: code + phone,
+      email: val('email'),
+      country: val('country'),
+      age: val('age'),
+      gender: val('gender'),
+      education: val('education'),
+      english: val('english'),
+      typing: val('typing'),
+      experience: val('experience'),
+      hours: val('hours'),
+      device: val('device'),
+      headphones: val('headphones'),
+      startToday: val('startToday'),
+      notes: val('notes'),
+      role: val('role')
+    });
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch(SCRIPT_URL, { method: 'POST', body: data });
+      const out = await res.json();
+
+      if (out.status === 'success') {
+        showPopup('Registration submitted', 'Join our WhatsApp group to get training details and task updates.');
+        form.reset();
+        document.getElementById('code').value = '+880';
+        document.getElementById('country').value = 'Bangladesh';
+      } else if (out.status === 'duplicate') {
+        showPopup('Already registered', 'This WhatsApp number is already registered. Join the group below if you have not joined yet.');
+      } else {
+        throw new Error(out.message || 'Unknown error');
+      }
+    } catch (ex) {
+      err.textContent = 'Submission failed. Check your internet connection and try again.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Submit registration';
+    }
+  });
+
+  function showPopup(title, text) {
+    document.getElementById('popTitle').textContent = title;
+    document.getElementById('popText').textContent = text;
+    document.getElementById('popup').classList.add('show');
+  }
+</script>
+</body>
+</html>
